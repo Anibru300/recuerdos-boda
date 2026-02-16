@@ -1,83 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Recuerdos de Boda</title>
-
-<style>
-body {
-  font-family: 'Georgia', serif;
-  background: #f9f7f4;
-  display: flex;
-  justify-content: center;
-  padding: 40px;
-}
-
-form {
-  background: white;
-  padding: 30px;
-  max-width: 400px;
-  width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.1);
-}
-
-h2 {
-  text-align: center;
-}
-
-input, textarea, button {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-}
-
-button {
-  background: #b89b5e;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-#mensaje {
-  margin-top: 15px;
-  text-align: center;
-  color: green;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Subir foto</title>
 </head>
-
 <body>
 
-<form 
+<form
+  action="https://script.google.com/macros/s/AKfycbw3SsyyINpLH2oBxgw4Kcrr3haGdkM9yoyrZ42lj6QZmUGrk_jf4AsEWQFx4nKakyZmOA/exec"
   method="POST"
-  action="https://script.google.com/macros/s/AKfycbzVlFhcdhIk-Qew4zMPwROKOeFtcLCG7BO7k4oXM81Cc4ZQncj7zzg7kYsCxulSibWvaw/exec"
   enctype="multipart/form-data"
-  target="hiddenFrame"
-  onsubmit="mostrarMensaje()"
 >
 
-  <h2>Comparte tus recuerdos</h2>
+  <input type="text" name="nombre" placeholder="Nombre" required><br><br>
+  <input type="email" name="correo" placeholder="Correo"><br><br>
+  <textarea name="comentario" placeholder="Comentario"></textarea><br><br>
 
-  <input type="text" name="nombre" placeholder="Tu nombre" required>
-  <input type="email" name="correo" placeholder="Correo (opcional)">
-  <textarea name="comentario" placeholder="Mensaje para los novios"></textarea>
+  <input type="file" name="foto" accept="image/*" required><br><br>
 
-  <input type="file" name="foto" accept="image/*" required>
+  <button type="submit">Enviar</button>
 
-  <button type="submit">Subir foto</button>
-
-  <div id="mensaje"></div>
 </form>
-
-<iframe name="hiddenFrame" style="display:none;"></iframe>
-
-<script>
-function mostrarMensaje() {
-  document.getElementById("mensaje").innerText =
-    "Fotos subidas, gracias por compartir tus recuerdos 💍✨";
-}
-</script>
 
 </body>
 </html>
