@@ -1,70 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <base target="_top">
+<meta charset="UTF-8">
+<title>Recuerdos de Boda</title>
+
+<style>
+body {
+  font-family: 'Georgia', serif;
+  background: #f9f7f4;
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+form {
+  background: white;
+  padding: 30px;
+  max-width: 400px;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.1);
+}
+
+h2 {
+  text-align: center;
+}
+
+input, textarea, button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+}
+
+button {
+  background: #b89b5e;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#mensaje {
+  margin-top: 15px;
+  text-align: center;
+  color: green;
+}
+</style>
 </head>
+
 <body>
 
-<h3>Formulario con foto</h3>
+<form 
+  method="POST"
+  action="https://script.google.com/macros/s/AKfycbx4iZ0RYQm7txEOR3e1TMuJH3voAi0wnNgogZmAL7UUTFtwoUIFS_mUwpGf76eNGEa1/exec"
+  enctype="multipart/form-data"
+  target="hiddenFrame"
+  onsubmit="mostrarMensaje()"
+>
 
-<input type="text" id="nombre" placeholder="Nombre"><br><br>
-<input type="email" id="correo" placeholder="Correo"><br><br>
-<textarea id="comentario" placeholder="Comentario"></textarea><br><br>
+  <h2>Comparte tus recuerdos</h2>
 
-<input type="file" id="foto" accept="image/*"><br><br>
+  <input type="text" name="nombre" placeholder="Tu nombre" required>
+  <input type="email" name="correo" placeholder="Correo (opcional)">
+  <textarea name="comentario" placeholder="Mensaje para los novios"></textarea>
 
-<button type="button" onclick="enviar()">Enviar</button>
+  <input type="file" name="foto" accept="image/*" required>
 
-<p id="estado"></p>
+  <button type="submit">Subir foto</button>
+
+  <div id="mensaje"></div>
+</form>
+
+<iframe name="hiddenFrame" style="display:none;"></iframe>
 
 <script>
-function enviar() {
-  const estado = document.getElementById("estado");
-  estado.innerText = "Procesando...";
-
-  const fileInput = document.getElementById("foto");
-
-  if (!fileInput.files.length) {
-    estado.innerText = "❌ No seleccionaste ninguna foto";
-    return;
-  }
-
-  const file = fileInput.files[0];
-  const reader = new FileReader();
-
-  reader.onload = function () {
-    fetch("https://script.google.com/macros/s/AKfycbx4iZ0RYQm7txEOR3e1TMuJH3voAi0wnNgogZmAL7UUTFtwoUIFS_mUwpGf76eNGEa1/exec", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        nombre: document.getElementById("nombre").value,
-        correo: document.getElementById("correo").value,
-        comentario: document.getElementById("comentario").value,
-        fotoBase64: reader.result,
-        fotoNombre: file.name
-      })
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.ok) {
-        estado.innerText = "✅ Enviado correctamente";
-      } else {
-        estado.innerText = "❌ Error: " + res.error;
-      }
-    })
-    .catch(err => {
-      estado.innerText = "❌ Error de red";
-      console.error(err);
-    });
-  };
-
-  reader.onerror = function () {
-    estado.innerText = "❌ Error al leer la imagen";
-  };
-
-  reader.readAsDataURL(file);
+function mostrarMensaje() {
+  document.getElementById("mensaje").innerText =
+    "Fotos subidas, gracias por compartir tus recuerdos 💍✨";
 }
 </script>
 
