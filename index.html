@@ -1,40 +1,72 @@
 <!DOCTYPE html>
 <html>
-  <body>
-    <h3>Formulario con foto</h3>
+<head>
+  <base target="_top">
+</head>
+<body>
 
-    <input type="text" id="nombre" placeholder="Nombre"><br><br>
-    <input type="email" id="correo" placeholder="Correo"><br><br>
-    <textarea id="comentario" placeholder="Comentario"></textarea><br><br>
+<h3>Formulario con foto</h3>
 
-    <input type="file" id="foto" accept="image/*"><br><br>
+<input type="text" id="nombre" placeholder="Nombre"><br><br>
+<input type="email" id="correo" placeholder="Correo"><br><br>
+<textarea id="comentario" placeholder="Comentario"></textarea><br><br>
 
-    <button onclick="enviar()">Enviar</button>
+<input type="file" id="foto" accept="image/*"><br><br>
 
-    <script>
-      function enviar() {
-        const fileInput = document.getElementById("foto");
-        const file = fileInput.files[0];
+<button type="button" onclick="enviar()">Enviar</button>
 
-        const reader = new FileReader();
+<p id="estado"></p>
 
-        reader.onload = function () {
-          fetch("https://script.google.com/macros/s/AKfycbw3SsyyINpLH2oBxgw4Kcrr3haGdkM9yoyrZ42lj6QZmUGrk_jf4AsEWQFx4nKakyZmOA/exec", {
-            method: "POST",
-            body: JSON.stringify({
-              nombre: document.getElementById("nombre").value,
-              correo: document.getElementById("correo").value,
-              comentario: document.getElementById("comentario").value,
-              fotoBase64: reader.result,
-              fotoNombre: file.name
-            })
-          })
-          .then(r => r.json())
-          .then(r => alert("Enviado correctamente"));
-        };
+<script>
+function enviar() {
+  const estado = document.getElementById("estado");
+  estado.innerText = "Procesando...";
 
-        reader.readAsDataURL(file);
+  const fileInput = document.getElementById("foto");
+
+  if (!fileInput.files.length) {
+    estado.innerText = "❌ No seleccionaste ninguna foto";
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function () {
+    fetch("https://script.google.com/macros/s/AKfycbw3SsyyINpLH2oBxgw4Kcrr3haGdkM9yoyrZ42lj6QZmUGrk_jf4AsEWQFx4nKakyZmOA/exec", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        nombre: document.getElementById("nombre").value,
+        correo: document.getElementById("correo").value,
+        comentario: document.getElementById("comentario").value,
+        fotoBase64: reader.result,
+        fotoNombre: file.name
+      })
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.ok) {
+        estado.innerText = "✅ Enviado correctamente";
+      } else {
+        estado.innerText = "❌ Error: " + res.error;
       }
-    </script>
-  </body>
+    })
+    .catch(err => {
+      estado.innerText = "❌ Error de red";
+      console.error(err);
+    });
+  };
+
+  reader.onerror = function () {
+    estado.innerText = "❌ Error al leer la imagen";
+  };
+
+  reader.readAsDataURL(file);
+}
+</script>
+
+</body>
 </html>
