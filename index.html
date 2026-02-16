@@ -3,24 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <title>Recuerdos de la Boda</title>
+
+<style>
+body {
+  font-family: Georgia, serif;
+  background: #f8f6f2;
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+form {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.1);
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #b89b5e;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#mensaje {
+  margin-top: 15px;
+  color: green;
+  text-align: center;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Sube tus fotos de la boda 💍</h2>
-
 <form
-  action="https://script.google.com/macros/s/AKfycbzVlFhcdhIk-Qew4zMPwROKOeFtcLCG7BO7k4oXM81Cc4ZQncj7zzg7kYsCxulSibWvaw/exec"
   method="POST"
+  action="https://script.google.com/macros/s/AKfycbzVlFhcdhIk-Qew4zMPwROKOeFtcLCG7BO7k4oXM81Cc4ZQncj7zzg7kYsCxulSibWvaw/exec"
   enctype="multipart/form-data"
+  target="iframeOculto"
+  onsubmit="mostrarMensaje()"
 >
+
+  <h2>Comparte tus fotos 💍</h2>
 
   <input type="text" name="nombre" placeholder="Tu nombre" required><br><br>
 
+  <!-- ⚠️ ESTE NOMBRE DEBE SER EXACTO -->
   <input type="file" name="foto" accept="image/*" required><br><br>
 
   <button type="submit">Subir foto</button>
 
+  <div id="mensaje"></div>
 </form>
+
+<iframe name="iframeOculto" style="display:none;"></iframe>
+
+<script>
+function mostrarMensaje() {
+  document.getElementById("mensaje").innerText =
+    "Fotos subidas, gracias por compartir este momento ✨";
+}
+</script>
 
 </body>
 </html>
