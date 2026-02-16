@@ -1,73 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Recuerdos de la Boda</title>
+<h2>Comparte tus fotos 💍</h2>
 
-<style>
-body {
-  font-family: Georgia, serif;
-  background: #f8f6f2;
-  display: flex;
-  justify-content: center;
-  padding: 40px;
-}
+<input type="text" id="nombre" placeholder="Tu nombre" required><br><br>
+<input type="file" id="foto" accept="image/*" required><br><br>
 
-form {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.1);
-}
+<button onclick="subirFoto()">Subir foto</button>
 
-button {
-  width: 100%;
-  padding: 12px;
-  background: #b89b5e;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-#mensaje {
-  margin-top: 15px;
-  color: green;
-  text-align: center;
-}
-</style>
-</head>
-
-<body>
-
-<form
-  method="POST"
-  action="https://script.google.com/macros/s/AKfycbzD2K1lKDraaFMFpr1xRK8WuV-GSRyBZLp5jQGL8gu3DwoSXRqoT5YoOWUK2l9AO9bdEA/exec"
-  enctype="multipart/form-data"
->
-
-
-  <h2>Comparte tus fotos 💍</h2>
-
-  <input type="text" name="nombre" placeholder="Tu nombre" required><br><br>
-
-  <!-- ⚠️ ESTE NOMBRE DEBE SER EXACTO -->
-  <input type="file" name="foto" accept="image/*" required><br><br>
-
-  <button type="submit">Subir foto</button>
-
-  <div id="mensaje"></div>
-</form>
-
-<iframe name="iframeOculto" style="display:none;"></iframe>
+<div id="mensaje"></div>
 
 <script>
-function mostrarMensaje() {
-  document.getElementById("mensaje").innerText =
-    "Fotos subidas, gracias por compartir este momento ✨";
+function subirFoto() {
+  const fileInput = document.getElementById("foto");
+  const nombre = document.getElementById("nombre").value;
+
+  if (!fileInput.files.length) {
+    alert("Selecciona una foto");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function () {
+    const base64 = reader.result.split(",")[1];
+
+    fetch("https://script.google.com/macros/s/AKfycbxceGalzLgfSGRIbOVTDIHDGr21uNHnjStttWY7ohzw_p55VjQrTwoD9OsHZsVFGmYEeQ/exec", {
+      method: "POST",
+      body: JSON.stringify({
+        nombre: nombre,
+        imagen: base64
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById("mensaje").innerText =
+        d.ok ? "Foto subida correctamente ✨" : d.mensaje;
+    });
+  };
+
+  reader.readAsDataURL(fileInput.files[0]);
 }
 </script>
-
-</body>
-</html>
