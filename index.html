@@ -1,236 +1,140 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Comparte tus recuerdos</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Recuerdos | Carlos & Jimena</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Tipografías elegantes -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+  <!-- Tipografías -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <style>
+    :root{
+      --bg1:#060913;
+      --bg2:#0a1023;
+      --gold:#caa24a;
+      --gold2:#e1c37a;
+      --text:#f5f5f7;
+      --muted:rgba(245,245,247,.75);
+    }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: #f7f4ef;
-            color: #333;
-        }
+    *{box-sizing:border-box;margin:0;padding:0}
 
-        header {
-            background: linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)),
-                        url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e') center/cover;
-            color: #fff;
-            text-align: center;
-            padding: 80px 20px;
-        }
+    body{
+      font-family:Inter,system-ui;
+      color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(900px 600px at 20% -10%, rgba(202,162,74,.18), transparent 55%),
+        radial-gradient(1000px 700px at 90% 20%, rgba(255,255,255,.06), transparent 60%),
+        linear-gradient(180deg, var(--bg2), var(--bg1));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
 
-        header h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.6rem;
-            margin-bottom: 10px;
-        }
+    .card{
+      max-width:780px;
+      width:100%;
+      border-radius:26px;
+      border:1px solid rgba(202,162,74,.35);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01));
+      box-shadow:0 30px 90px rgba(0,0,0,.6);
+      padding:40px 28px;
+      text-align:center;
+    }
 
-        header p {
-            font-size: 1.1rem;
-            opacity: .9;
-        }
+    .kicker{
+      font-size:18px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:14px;
+    }
 
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-        }
+    h1{
+      font-family:"Cormorant Garamond", serif;
+      font-size:56px;
+      line-height:1.1;
+      color:#f6e7c0;
+      margin-bottom:12px;
+    }
 
-        .info {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: .95rem;
-        }
+    .date{
+      font-size:20px;
+      margin-bottom:28px;
+      color:var(--muted);
+    }
 
-        .info span {
-            display: inline-block;
-            margin: 6px 12px;
-        }
+    .text{
+      max-width:560px;
+      margin:0 auto 34px;
+      line-height:1.7;
+      font-size:16px;
+      color:rgba(245,245,247,.85);
+    }
 
-        .upload-box {
-            border: 2px dashed #c2a46d;
-            background: #fff;
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: .3s;
-        }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px 28px;
+      border-radius:999px;
+      border:1px solid rgba(202,162,74,.7);
+      background:rgba(202,162,74,.25);
+      color:var(--text);
+      font-weight:700;
+      text-decoration:none;
+      transition:.25s ease;
+      box-shadow:0 18px 50px rgba(0,0,0,.55);
+    }
 
-        .upload-box:hover {
-            background: #faf8f4;
-        }
+    .btn:hover{
+      background:rgba(202,162,74,.35);
+      transform:translateY(-2px);
+    }
 
-        .upload-box input {
-            display: none;
-        }
+    .hint{
+      margin-top:18px;
+      font-size:13px;
+      color:var(--muted);
+    }
 
-        .upload-box h3 {
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-
-        .upload-box p {
-            font-size: .9rem;
-            color: #777;
-        }
-
-        .preview {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .preview-item {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .preview-item img,
-        .preview-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .remove {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(0,0,0,.6);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-        }
-
-        .submit-btn {
-            display: block;
-            margin: 40px auto 0;
-            padding: 15px 40px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 30px;
-            background: #c2a46d;
-            color: #fff;
-            cursor: pointer;
-            transition: .3s;
-        }
-
-        .submit-btn:hover {
-            background: #b09158;
-        }
-
-        footer {
-            text-align: center;
-            font-size: .8rem;
-            color: #777;
-            margin: 40px 0 20px;
-        }
-    </style>
+    @media(max-width:600px){
+      h1{font-size:42px}
+      .card{padding:32px 20px}
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-    <h1>Comparte tus recuerdos</h1>
-    <p>Sube tus fotos y videos del evento y conserva este momento especial</p>
-</header>
+  <div class="card">
+    <div class="kicker">Recuerdos de nuestra boda</div>
 
-<div class="container">
+    <h1>Carlos & Jimena</h1>
 
-    <div class="info">
-        <span>📷 Hasta 10 archivos</span>
-        <span>🎥 Fotos y videos</span>
-        <span>💾 Máx. 100 MB</span>
-        <span>🔒 Sin registro</span>
+    <div class="date">29 · Agosto · 2026</div>
+
+    <p class="text">
+      Gracias por acompañarnos en uno de los días más importantes de nuestra vida.  
+      Nos encantaría ver la boda desde tus ojos 🤍  
+      Comparte aquí tus fotos y videos para guardar estos recuerdos para siempre.
+    </p>
+
+    <a 
+      class="btn" 
+      href="https://docs.google.com/forms/d/e/1FAIpQLSdCna5ctVvjHbE-6EdbSUf6BFxrHQ66AQIvWo1uR-ZfVIvgPA/viewform"
+      target="_blank"
+    >
+      Subir fotos y videos
+    </a>
+
+    <div class="hint">
+      Puedes subir varias fotos o videos al mismo tiempo · Sin registro · Fácil y rápido
     </div>
-
-    <label class="upload-box">
-        <input type="file" id="fileInput" multiple accept="image/*,video/*">
-        <h3>Arrastra tus fotos y videos aquí</h3>
-        <p>o haz clic para seleccionar varios archivos</p>
-    </label>
-
-    <div class="preview" id="preview"></div>
-
-    <button class="submit-btn" onclick="submitFiles()">Subir recuerdos</button>
-
-</div>
-
-<footer>
-    Recuerdos del evento · 2026
-</footer>
-
-<script>
-    const input = document.getElementById('fileInput');
-    const preview = document.getElementById('preview');
-    let files = [];
-
-    input.addEventListener('change', () => {
-        for (const file of input.files) {
-            if (files.length >= 10) {
-                alert('Máximo 10 archivos');
-                break;
-            }
-            files.push(file);
-            renderPreview(file);
-        }
-        input.value = '';
-    });
-
-    function renderPreview(file) {
-        const div = document.createElement('div');
-        div.className = 'preview-item';
-
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'remove';
-        removeBtn.innerHTML = '×';
-        removeBtn.onclick = () => {
-            files = files.filter(f => f !== file);
-            div.remove();
-        };
-
-        if (file.type.startsWith('image')) {
-            const img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            div.appendChild(img);
-        } else {
-            const video = document.createElement('video');
-            video.src = URL.createObjectURL(file);
-            video.muted = true;
-            video.playsInline = true;
-            div.appendChild(video);
-        }
-
-        div.appendChild(removeBtn);
-        preview.appendChild(div);
-    }
-
-    function submitFiles() {
-        if (files.length === 0) {
-            alert('Selecciona al menos un archivo');
-            return;
-        }
-
-        alert('Diseño listo ✅\n\nEn el siguiente paso conectamos esto para guardar los archivos.');
-    }
-</script>
+  </div>
 
 </body>
 </html>
