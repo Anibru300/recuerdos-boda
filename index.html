@@ -1,154 +1,183 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Recuerdos | Carlos & Jimena</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Recuerdos de Boda | Carlos & Jimena</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- Tipografías -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 
-<style>
-:root{
-  --bg:#0a0f1f;
-  --gold:#caa24a;
-  --gold2:#e8cf8a;
-  --text:#f5f5f7;
-  --muted:rgba(255,255,255,.7);
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: #f7f3ef;
+      color: #4b3b2a;
+    }
 
-*{box-sizing:border-box;margin:0;padding:0}
+    header {
+      background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)),
+        url("https://images.unsplash.com/photo-1520854221256-17451cc331bf");
+      background-size: cover;
+      background-position: center;
+      text-align: center;
+      padding: 80px 20px;
+      color: white;
+    }
 
-body{
-  min-height:100vh;
-  background:radial-gradient(circle at top,rgba(202,162,74,.18),transparent 60%),var(--bg);
-  font-family:Inter;
-  color:var(--text);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
-}
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
 
-.card{
-  max-width:850px;
-  width:100%;
-  border-radius:28px;
-  border:1px solid rgba(202,162,74,.4);
-  padding:40px 28px;
-  background:rgba(255,255,255,.04);
-  text-align:center;
-}
+    header p {
+      font-size: 18px;
+      opacity: 0.95;
+    }
 
-h1{
-  font-family:"Cormorant Garamond",serif;
-  font-size:54px;
-  color:var(--gold2);
-  margin-bottom:10px;
-}
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 40px 25px;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    }
 
-.sub{
-  color:var(--muted);
-  margin-bottom:28px;
-}
+    h2 {
+      font-family: 'Playfair Display', serif;
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-.upload-box{
-  border:2px dashed rgba(202,162,74,.6);
-  border-radius:20px;
-  padding:28px;
-  cursor:pointer;
-  transition:.3s;
-}
+    .subtitle {
+      text-align: center;
+      font-size: 15px;
+      margin-bottom: 30px;
+      color: #7a6a58;
+    }
 
-.upload-box:hover{
-  background:rgba(202,162,74,.08);
-}
+    input[type="file"] {
+      display: block;
+      margin: 0 auto 20px;
+      font-size: 14px;
+    }
 
-.upload-box input{
-  display:none;
-}
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 14px 40px;
+      font-size: 15px;
+      border: none;
+      border-radius: 30px;
+      background: #a4834c;
+      color: white;
+      cursor: pointer;
+      transition: background .3s;
+    }
 
-.preview{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
-  gap:10px;
-  margin-top:20px;
-}
+    button:hover {
+      background: #8d6f3f;
+    }
 
-.preview img, .preview video{
-  width:100%;
-  height:90px;
-  object-fit:cover;
-  border-radius:12px;
-}
+    #preview {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
 
-button{
-  margin-top:28px;
-  padding:14px 30px;
-  border-radius:999px;
-  border:none;
-  background:var(--gold);
-  color:#000;
-  font-weight:700;
-  cursor:pointer;
-  transition:.3s;
-}
+    #preview img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,.15);
+    }
 
-button:hover{opacity:.9}
+    #mensaje {
+      text-align: center;
+      font-size: 16px;
+      margin-top: 25px;
+      display: none;
+      color: #2f6b3c;
+    }
 
-.msg{
-  margin-top:18px;
-  font-size:14px;
-  color:var(--gold2);
-  display:none;
-}
-
-@media(max-width:600px){
-  h1{font-size:42px}
-}
-</style>
+    footer {
+      text-align: center;
+      padding: 25px;
+      font-size: 13px;
+      color: #7a6a58;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="card">
+<header>
   <h1>Carlos & Jimena</h1>
-  <div class="sub">Gracias por compartir nuestros recuerdos</div>
+  <p>Gracias por ser parte de nuestro gran día</p>
+</header>
 
-  <label class="upload-box">
-    <strong>Arrastra o selecciona fotos y videos</strong><br>
-    <small>(hasta 10 archivos · 100 MB)</small>
-    <input type="file" id="files" multiple accept="image/*,video/*">
-  </label>
+<div class="container">
+  <h2>Comparte tus recuerdos 📸</h2>
+  <p class="subtitle">
+    Sube tus fotos de nuestra boda y ayúdanos a revivir cada momento especial.
+  </p>
 
-  <div class="preview" id="preview"></div>
+  <input type="file" id="fotos" multiple accept="image/*" />
+  <button onclick="subirFotos()">Subir fotos</button>
 
-  <button onclick="upload()">Subir recuerdos</button>
-
-  <div class="msg" id="msg">✨ Fotos subidas correctamente, gracias por compartir este momento con nosotros ✨</div>
+  <div id="preview"></div>
+  <div id="mensaje">✨ ¡Fotos subidas con éxito! Gracias por compartir estos recuerdos con nosotros 💕</div>
 </div>
 
+<footer>
+  Con cariño, Carlos & Jimena 💍
+</footer>
+
 <script>
-const input = document.getElementById("files");
-const preview = document.getElementById("preview");
-let filesList = [];
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3SsyyINpLH2oBxgw4Kcrr3haGdkM9yoyrZ42lj6QZmUGrk_jf4AsEWQFx4nKakyZmOA/exec";
 
-input.addEventListener("change", e=>{
-  filesList = [...e.target.files];
-  preview.innerHTML = "";
-  filesList.forEach(f=>{
-    const el = document.createElement(f.type.startsWith("video")?"video":"img");
-    el.src = URL.createObjectURL(f);
-    el.muted = true;
-    preview.appendChild(el);
+  const input = document.getElementById("fotos");
+  const preview = document.getElementById("preview");
+  const mensaje = document.getElementById("mensaje");
+
+  input.addEventListener("change", () => {
+    preview.innerHTML = "";
+    Array.from(input.files).forEach(file => {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      preview.appendChild(img);
+    });
   });
-});
 
-function upload(){
-  if(!filesList.length) return;
+  function subirFotos() {
+    if (input.files.length === 0) {
+      alert("Selecciona al menos una foto");
+      return;
+    }
 
-  // aquí se conecta el backend (PASO 2)
-  document.getElementById("msg").style.display="block";
-}
+    Array.from(input.files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            nombre: file.name,
+            tipo: file.type,
+            archivo: reader.result
+          })
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    mensaje.style.display = "block";
+    input.value = "";
+  }
 </script>
 
 </body>
