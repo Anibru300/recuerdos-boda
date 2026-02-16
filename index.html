@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Comparte tus recuerdos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Tipografías elegantes -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f7f4ef;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)),
+                        url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e') center/cover;
+            color: #fff;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: .9;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .info {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: .95rem;
+        }
+
+        .info span {
+            display: inline-block;
+            margin: 6px 12px;
+        }
+
+        .upload-box {
+            border: 2px dashed #c2a46d;
+            background: #fff;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .upload-box:hover {
+            background: #faf8f4;
+        }
+
+        .upload-box input {
+            display: none;
+        }
+
+        .upload-box h3 {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .upload-box p {
+            font-size: .9rem;
+            color: #777;
+        }
+
+        .preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .preview-item img,
+        .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,.6);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            display: block;
+            margin: 40px auto 0;
+            padding: 15px 40px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 30px;
+            background: #c2a46d;
+            color: #fff;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .submit-btn:hover {
+            background: #b09158;
+        }
+
+        footer {
+            text-align: center;
+            font-size: .8rem;
+            color: #777;
+            margin: 40px 0 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Comparte tus recuerdos</h1>
+    <p>Sube tus fotos y videos del evento y conserva este momento especial</p>
+</header>
+
+<div class="container">
+
+    <div class="info">
+        <span>📷 Hasta 10 archivos</span>
+        <span>🎥 Fotos y videos</span>
+        <span>💾 Máx. 100 MB</span>
+        <span>🔒 Sin registro</span>
+    </div>
+
+    <label class="upload-box">
+        <input type="file" id="fileInput" multiple accept="image/*,video/*">
+        <h3>Arrastra tus fotos y videos aquí</h3>
+        <p>o haz clic para seleccionar varios archivos</p>
+    </label>
+
+    <div class="preview" id="preview"></div>
+
+    <button class="submit-btn" onclick="submitFiles()">Subir recuerdos</button>
+
+</div>
+
+<footer>
+    Recuerdos del evento · 2026
+</footer>
+
+<script>
+    const input = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    let files = [];
+
+    input.addEventListener('change', () => {
+        for (const file of input.files) {
+            if (files.length >= 10) {
+                alert('Máximo 10 archivos');
+                break;
+            }
+            files.push(file);
+            renderPreview(file);
+        }
+        input.value = '';
+    });
+
+    function renderPreview(file) {
+        const div = document.createElement('div');
+        div.className = 'preview-item';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove';
+        removeBtn.innerHTML = '×';
+        removeBtn.onclick = () => {
+            files = files.filter(f => f !== file);
+            div.remove();
+        };
+
+        if (file.type.startsWith('image')) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            div.appendChild(img);
+        } else {
+            const video = document.createElement('video');
+            video.src = URL.createObjectURL(file);
+            video.muted = true;
+            video.playsInline = true;
+            div.appendChild(video);
+        }
+
+        div.appendChild(removeBtn);
+        preview.appendChild(div);
+    }
+
+    function submitFiles() {
+        if (files.length === 0) {
+            alert('Selecciona al menos un archivo');
+            return;
+        }
+
+        alert('Diseño listo ✅\n\nEn el siguiente paso conectamos esto para guardar los archivos.');
+    }
+</script>
+
+</body>
+</html>
