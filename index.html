@@ -1,184 +1,40 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Recuerdos de Boda | Carlos & Jimena</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html>
+  <body>
+    <h3>Formulario con foto</h3>
 
-  <!-- Tipografías -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <input type="text" id="nombre" placeholder="Nombre"><br><br>
+    <input type="email" id="correo" placeholder="Correo"><br><br>
+    <textarea id="comentario" placeholder="Comentario"></textarea><br><br>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Montserrat', sans-serif;
-      background: #f7f3ef;
-      color: #4b3b2a;
-    }
+    <input type="file" id="foto" accept="image/*"><br><br>
 
-    header {
-      background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)),
-        url("https://images.unsplash.com/photo-1520854221256-17451cc331bf");
-      background-size: cover;
-      background-position: center;
-      text-align: center;
-      padding: 80px 20px;
-      color: white;
-    }
+    <button onclick="enviar()">Enviar</button>
 
-    header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
+    <script>
+      function enviar() {
+        const fileInput = document.getElementById("foto");
+        const file = fileInput.files[0];
 
-    header p {
-      font-size: 18px;
-      opacity: 0.95;
-    }
+        const reader = new FileReader();
 
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
-      background: white;
-      padding: 40px 25px;
-      border-radius: 14px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.08);
-    }
-
-    h2 {
-      font-family: 'Playfair Display', serif;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    .subtitle {
-      text-align: center;
-      font-size: 15px;
-      margin-bottom: 30px;
-      color: #7a6a58;
-    }
-
-    input[type="file"] {
-      display: block;
-      margin: 0 auto 20px;
-      font-size: 14px;
-    }
-
-    button {
-      display: block;
-      margin: 20px auto;
-      padding: 14px 40px;
-      font-size: 15px;
-      border: none;
-      border-radius: 30px;
-      background: #a4834c;
-      color: white;
-      cursor: pointer;
-      transition: background .3s;
-    }
-
-    button:hover {
-      background: #8d6f3f;
-    }
-
-    #preview {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 12px;
-      margin-top: 30px;
-    }
-
-    #preview img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,.15);
-    }
-
-    #mensaje {
-      text-align: center;
-      font-size: 16px;
-      margin-top: 25px;
-      display: none;
-      color: #2f6b3c;
-    }
-
-    footer {
-      text-align: center;
-      padding: 25px;
-      font-size: 13px;
-      color: #7a6a58;
-    }
-  </style>
-</head>
-
-<body>
-
-<header>
-  <h1>Carlos & Jimena</h1>
-  <p>Gracias por ser parte de nuestro gran día</p>
-</header>
-
-<div class="container">
-  <h2>Comparte tus recuerdos 📸</h2>
-  <p class="subtitle">
-    Sube tus fotos de nuestra boda y ayúdanos a revivir cada momento especial.
-  </p>
-
-  <input type="file" id="fotos" multiple accept="image/*" />
-  <button onclick="subirFotos()">Subir fotos</button>
-
-  <div id="preview"></div>
-  <div id="mensaje">✨ ¡Fotos subidas con éxito! Gracias por compartir estos recuerdos con nosotros 💕</div>
-</div>
-
-<footer>
-  Con cariño, Carlos & Jimena 💍
-</footer>
-
-<script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3SsyyINpLH2oBxgw4Kcrr3haGdkM9yoyrZ42lj6QZmUGrk_jf4AsEWQFx4nKakyZmOA/exec";
-
-  const input = document.getElementById("fotos");
-  const preview = document.getElementById("preview");
-  const mensaje = document.getElementById("mensaje");
-
-  input.addEventListener("change", () => {
-    preview.innerHTML = "";
-    Array.from(input.files).forEach(file => {
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      preview.appendChild(img);
-    });
-  });
-
-  function subirFotos() {
-    if (input.files.length === 0) {
-      alert("Selecciona al menos una foto");
-      return;
-    }
-
-    Array.from(input.files).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify({
-            nombre: file.name,
-            tipo: file.type,
-            archivo: reader.result
+        reader.onload = function () {
+          fetch("https://script.google.com/macros/s/AKfycbw3SsyyINpLH2oBxgw4Kcrr3haGdkM9yoyrZ42lj6QZmUGrk_jf4AsEWQFx4nKakyZmOA/exec", {
+            method: "POST",
+            body: JSON.stringify({
+              nombre: document.getElementById("nombre").value,
+              correo: document.getElementById("correo").value,
+              comentario: document.getElementById("comentario").value,
+              fotoBase64: reader.result,
+              fotoNombre: file.name
+            })
           })
-        });
-      };
-      reader.readAsDataURL(file);
-    });
+          .then(r => r.json())
+          .then(r => alert("Enviado correctamente"));
+        };
 
-    mensaje.style.display = "block";
-    input.value = "";
-  }
-</script>
-
-</body>
+        reader.readAsDataURL(file);
+      }
+    </script>
+  </body>
 </html>
