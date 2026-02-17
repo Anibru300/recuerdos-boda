@@ -6,36 +6,67 @@
 <button onclick="subirFoto()">Subir foto</button>
 
 <div id="mensaje"></div>
+<div id="cargando" style="display: none;">Subiendo foto...</div>
 
 <script>
 function subirFoto() {
   const fileInput = document.getElementById("foto");
   const nombre = document.getElementById("nombre").value;
+  const mensajeDiv = document.getElementById("mensaje");
+  const cargandoDiv = document.getElementById("cargando");
 
   if (!fileInput.files.length) {
     alert("Selecciona una foto");
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = function () {
-    const base64 = reader.result.split(",")[1];
+  if (!nombre.trim()) {
+    alert("Por favor, introduce tu nombre");
+    return;
+  }
 
-    fetch("https://script.google.com/macros/s/AKfycbxceGalzLgfSGRIbOVTDIHDGr21uNHnjStttWY7ohzw_p55VjQrTwoD9OsHZsVFGmYEeQ/exec", {
-      method: "POST",
-      body: JSON.stringify({
-        nombre: nombre,
-        imagen: base64
-      }),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    .then(r => r.json())
-    .then(d => {
-      document.getElementById("mensaje").innerText =
-        d.ok ? "Foto subida correctamente ✨" : d.mensaje;
-    });
+  // Mostrar indicador de carga
+  cargandoDiv.style.display = "block";
+  mensajeDiv.innerText = "";
+
+  const reader = new FileReader();
+  
+  reader.onload = async function (e) {
+    try {
+      const base64String = e.target.result;
+      const base64 = base64String.split(",")[1];
+      
+      // Detectar extensión de la imagen
+      const extension = fileInput.files[0].type.split('/')[1] || 'jpg';
+
+      // URL de tu Apps Script DESPUÉS de publicarlo
+      const scriptUrl = "https://script.google.com/macros/s/AKfycbwen_iGXXDhtzBeoaHObC_V_IYN-IcIpIcNCTFou21awlwh5CRkvSJzKhO0bg4zMR-flA/exec";
+
+      const response = await fetch(scriptUrl, {
+        method: "POST",
+        mode: "no-cors", // Importante para CORS
+        body: JSON.stringify({
+          nombre: nombre,
+          imagen: base64,
+          extension: extension
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      // Con no-cors no podemos leer la respuesta
+      mensajeDiv.innerText = "Foto subida correctamente ✨ (si no ves errores)";
+      
+      // Limpiar formulario
+      document.getElementById("nombre").value = "";
+      document.getElementById("foto").value = "";
+      
+    } catch (error) {
+      mensajeDiv.innerText = "Error al subir: " + error.message;
+    } finally {
+      cargandoDiv.style.display = "none";
+    }
   };
 
   reader.readAsDataURL(fileInput.files[0]);
