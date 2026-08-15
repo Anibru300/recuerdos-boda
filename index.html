@@ -3,85 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carlos & Jimena - Comparte tus recuerdos</title>
+    <title>Carlos y Jimena — Comparte tus recuerdos</title>
+    <meta name="description" content="Comparte tus fotos y videos de la boda de Carlos y Jimena — 29 de agosto de 2026">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💛</text></svg>">
+
+    <!-- Mismas fuentes de la invitación -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Confetti dorado para celebrar cada subida -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
     <style>
+        :root {
+            --bg1: #060913;
+            --bg2: #0a1023;
+            --gold: #caa24a;
+            --gold2: #e1c37a;
+            --gold3: #f6e7c0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: radial-gradient(ellipse at top, var(--bg2), var(--bg1) 70%);
+            color: #fff;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 24px 16px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
+        ::selection {
+            background: rgba(202, 162, 74, 0.3);
+            color: #fff;
+        }
+
+        #particles-bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ---------- Tarjeta principal ---------- */
         .container {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            max-width: 700px;
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(180deg, rgba(13, 20, 41, 0.92), rgba(6, 9, 19, 0.97));
+            border: 1px solid rgba(202, 162, 74, 0.35);
+            padding: 44px 36px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(202, 162, 74, 0.08);
+            max-width: 640px;
             width: 100%;
             text-align: center;
+            backdrop-filter: blur(6px);
+            margin: 24px auto;
+            animation: card-in 0.9s ease-out both;
         }
 
-        h1 {
-            color: #ff6b6b;
-            margin: 0 0 5px 0;
-            font-size: 36px;
-            letter-spacing: 1px;
+        @keyframes card-in {
+            from { opacity: 0; transform: translateY(28px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ---------- Encabezado ---------- */
+        .foto-portada {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 30px rgba(202, 162, 74, 0.4);
+            margin: 0 auto 14px;
+            display: block;
         }
 
         .anillo {
-            font-size: 30px;
+            font-size: 26px;
+            display: inline-block;
+            animation: heartbeat 2.4s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            10% { transform: scale(1.25); }
+            20% { transform: scale(1); }
+            30% { transform: scale(1.25); }
+            50% { transform: scale(1); }
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-weight: 400;
+            font-size: clamp(44px, 9vw, 64px);
+            margin: 6px 0 2px;
+            line-height: 1.15;
+            background: linear-gradient(90deg, #f6e7c0 0%, #ffffff 25%, #fff8dc 50%, #ffffff 75%, #f6e7c0 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3.5s linear infinite;
+        }
+
+        @keyframes shimmer {
+            to { background-position: 200% center; }
         }
 
         .subtitulo {
-            color: #4ecdc4;
-            font-size: 18px;
-            font-style: italic;
-            margin-bottom: 8px;
+            font-family: 'Playfair Display', serif;
+            color: var(--gold2);
+            font-size: 15px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .fecha {
+            font-family: 'Playfair Display', serif;
+            color: rgba(246, 231, 192, 0.75);
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .divisor {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 14px 0 20px;
+        }
+
+        .divisor::before,
+        .divisor::after {
+            content: '';
+            height: 1px;
+            width: 80px;
+            background: linear-gradient(90deg, transparent, var(--gold));
+        }
+
+        .divisor::after {
+            background: linear-gradient(90deg, var(--gold), transparent);
+        }
+
+        .divisor span {
+            color: var(--gold);
+            font-size: 14px;
         }
 
         .mensaje-bienvenida {
-            color: #666;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 300;
             font-size: 15px;
-            margin-bottom: 20px;
-            line-height: 1.5;
+            line-height: 1.7;
+            margin: 0 0 20px;
         }
 
+        /* ---------- Info de límites ---------- */
         .limites-info {
-            background: #f0f8ff;
-            padding: 15px;
-            border-radius: 10px;
+            background: rgba(202, 162, 74, 0.06);
+            border: 1px solid rgba(202, 162, 74, 0.2);
+            border-left: 3px solid var(--gold);
+            padding: 14px 16px;
+            border-radius: 12px;
             margin: 20px 0;
             text-align: left;
-            font-size: 14px;
-            color: #333;
-            border-left: 4px solid #4ecdc4;
-            font-family: 'Arial', sans-serif;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .limites-info strong {
+            color: var(--gold3);
         }
 
         .limites-info ul {
-            margin: 10px 0 0 0;
+            margin: 8px 0 0;
             padding-left: 20px;
         }
 
+        .limites-info li {
+            margin: 3px 0;
+        }
+
+        /* ---------- Inputs ---------- */
         input[type="text"] {
             width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 2px solid #eee;
-            border-radius: 10px;
+            padding: 15px 18px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(202, 162, 74, 0.3);
+            border-radius: 12px;
             font-size: 16px;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            color: #fff;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(202, 162, 74, 0.15);
         }
 
         .file-input {
             position: relative;
-            margin: 20px 0;
+            margin: 18px 0;
         }
 
         input[type="file"] {
@@ -95,40 +242,54 @@
 
         .file-label {
             display: inline-block;
-            padding: 15px 30px;
-            background: #4ecdc4;
-            color: white;
-            border-radius: 10px;
+            padding: 16px 30px;
+            background: transparent;
+            border: 1px dashed rgba(202, 162, 74, 0.6);
+            color: var(--gold3);
+            border-radius: 14px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
+            font-size: 15px;
+            transition: all 0.3s;
             width: 100%;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
         }
 
         .file-label:hover {
-            background: #45b7b0;
+            background: rgba(202, 162, 74, 0.1);
+            border-color: var(--gold);
+            transform: translateY(-1px);
         }
 
+        /* ---------- Previews ---------- */
         .preview-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
             gap: 8px;
-            margin: 20px 0;
+            margin: 18px 0;
             max-height: 250px;
             overflow-y: auto;
             padding: 10px;
-            border: 2px dashed #eee;
-            border-radius: 10px;
+            border: 1px dashed rgba(202, 162, 74, 0.25);
+            border-radius: 12px;
+        }
+
+        .preview-container:empty {
+            border-style: none;
+            padding: 0;
+            margin: 0;
         }
 
         .preview-item {
             position: relative;
             aspect-ratio: 1;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid rgba(202, 162, 74, 0.25);
+            animation: pop-in 0.35s ease-out both;
+        }
+
+        @keyframes pop-in {
+            from { opacity: 0; transform: scale(0.8); }
+            to   { opacity: 1; transform: scale(1); }
         }
 
         .preview-item img,
@@ -143,11 +304,10 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0,0,0,0.7);
-            color: white;
+            background: rgba(0, 0, 0, 0.75);
+            color: var(--gold3);
             font-size: 8px;
             padding: 2px;
-            text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -157,9 +317,10 @@
             position: absolute;
             top: 0;
             right: 0;
-            background: rgba(255,107,107,0.9);
-            color: white;
+            background: rgba(202, 162, 74, 0.9);
+            color: var(--bg1);
             font-size: 8px;
+            font-weight: 600;
             padding: 2px 4px;
             border-radius: 0 0 0 6px;
         }
@@ -168,8 +329,8 @@
             position: absolute;
             top: 2px;
             left: 2px;
-            background: rgba(0,0,0,0.7);
-            color: white;
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
             border: none;
             border-radius: 50%;
             width: 20px;
@@ -182,21 +343,26 @@
             z-index: 2;
         }
 
+        /* ---------- Stats ---------- */
         .stats {
             display: flex;
             justify-content: space-between;
             margin: 10px 0;
-            padding: 10px;
-            background: #f5f5f5;
-            border-radius: 10px;
-            font-weight: bold;
-            font-family: 'Arial', sans-serif;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(202, 162, 74, 0.15);
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
         }
 
+        /* ---------- Progreso ---------- */
         .progress-bar {
             width: 100%;
-            height: 25px;
-            background: #eee;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(202, 162, 74, 0.25);
             border-radius: 15px;
             overflow: hidden;
             margin: 20px 0;
@@ -206,7 +372,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            background: linear-gradient(90deg, var(--gold), var(--gold3));
             width: 0%;
             transition: width 0.3s;
         }
@@ -216,81 +382,107 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: white;
-            font-weight: bold;
+            color: #fff;
+            font-weight: 600;
             font-size: 12px;
-            text-shadow: 1px 1px 2px black;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
             z-index: 1;
         }
 
-        button {
-            background: #ff6b6b;
-            color: white;
+        /* ---------- Botón principal ---------- */
+        .btn-subir {
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            color: var(--bg1);
             border: none;
-            padding: 15px 40px;
+            padding: 16px 44px;
             border-radius: 50px;
-            font-size: 18px;
+            font-size: 17px;
             cursor: pointer;
-            transition: transform 0.3s, background 0.3s;
-            margin-top: 20px;
-            font-weight: bold;
-            font-family: 'Arial', sans-serif;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 24px rgba(202, 162, 74, 0.35);
+            font-family: 'Inter', sans-serif;
         }
 
-        button:hover:not(:disabled) {
-            background: #ff5252;
+        .btn-subir:hover:not(:disabled) {
             transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(202, 162, 74, 0.5);
         }
 
-        button:disabled {
+        .btn-subir:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
+        /* ---------- Mensajes ---------- */
         #mensaje {
-            margin: 20px 0;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: bold;
+            margin: 20px 0 0;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
             display: none;
             max-height: 300px;
             overflow-y: auto;
             text-align: left;
             white-space: pre-line;
-            font-family: 'Arial', sans-serif;
         }
 
         .exito {
-            background: #d4edda;
-            color: #155724;
+            background: rgba(40, 167, 69, 0.12);
+            border: 1px solid rgba(40, 167, 69, 0.4);
+            color: #8ee6a8;
             display: block !important;
         }
 
         .error {
-            background: #f8d7da;
-            color: #721c24;
+            background: rgba(220, 53, 69, 0.12);
+            border: 1px solid rgba(220, 53, 69, 0.4);
+            color: #f1a7ae;
             display: block !important;
         }
 
         .info {
-            background: #d1ecf1;
-            color: #0c5460;
+            background: rgba(202, 162, 74, 0.08);
+            border: 1px solid rgba(202, 162, 74, 0.3);
+            color: var(--gold3);
             display: block !important;
         }
 
         .firma {
-            margin-top: 25px;
-            color: #999;
-            font-size: 13px;
-            font-style: italic;
+            margin-top: 26px;
+            font-family: 'Great Vibes', cursive;
+            color: rgba(225, 195, 122, 0.7);
+            font-size: 22px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg1); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+        @media (max-width: 480px) {
+            .container { padding: 32px 20px; }
         }
     </style>
 </head>
 <body>
+    <canvas id="particles-bg"></canvas>
+
     <div class="container">
-        <div class="anillo">💍</div>
-        <h1>Carlos & Jimena</h1>
+        <img class="foto-portada"
+             src="https://raw.githubusercontent.com/Anibru300/Invitacion-a-mi-Boda/main/images/principal.jpeg"
+             alt="Carlos y Jimena"
+             onerror="this.style.display='none'">
+        <span class="anillo">💍</span>
+        <h1>Carlos &amp; Jimena</h1>
         <div class="subtitulo">Nuestra Boda</div>
+        <div class="fecha">29 · Agosto · 2026</div>
+
+        <div class="divisor"><span>✦</span></div>
+
         <p class="mensaje-bienvenida">
             ¡Gracias por celebrar con nosotros!<br>
             Ayúdanos a guardar cada momento: comparte tus fotos y videos de este día tan especial.
@@ -325,11 +517,11 @@
             <div class="progress-text" id="progressText">0%</div>
         </div>
 
-        <button onclick="subirArchivos()" id="btnSubir">Subir archivos 📤</button>
+        <button onclick="subirArchivos()" id="btnSubir" class="btn-subir">Subir archivos ✦</button>
 
         <div id="mensaje"></div>
 
-        <div class="firma">Con amor, Carlos & Jimena 💕</div>
+        <div class="firma">Con amor, Carlos &amp; Jimena</div>
     </div>
 
     <script>
@@ -337,7 +529,7 @@
 
         /*
          * Verificación de subida: el Apps Script responde JSON.
-         * Se acepta cualquiera de estos formatos de éxito:
+         * Formatos de éxito aceptados:
          *   { "ok": true, ... }        <- formato actual del script en producción
          *   { "status": "success" }    <- formato del apps-script.gs de referencia
          * Probado el 2026-08-16: el script responde {"ok":true,"mensaje":"..."} ✅
@@ -352,14 +544,87 @@
 
         let archivosSeleccionados = [];
 
+        // ==========================
+        // Partículas doradas (igual que en la invitación)
+        // ==========================
+        (function initParticles() {
+            const canvas = document.getElementById('particles-bg');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const isMobile = window.innerWidth < 768;
+            const particleCount = isMobile ? 50 : 100;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 4 + 1.5,
+                    speedY: Math.random() * 2 + 1,
+                    speedX: Math.random() * 0.6 - 0.3,
+                    opacity: Math.random() * 0.4 + 0.6,
+                    color: ['202, 162, 74', '225, 195, 122', '246, 231, 192', '255, 255, 255'][Math.floor(Math.random() * 4)],
+                    twinkle: Math.random() * Math.PI * 2
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += p.speedX + Math.sin(p.y * 0.01) * 0.3;
+                    p.twinkle += 0.05;
+
+                    if (p.y > canvas.height + 10) { p.y = -10; p.x = Math.random() * canvas.width; }
+                    if (p.x < -10) p.x = canvas.width + 10;
+                    if (p.x > canvas.width + 10) p.x = -10;
+
+                    const twinkleAlpha = p.opacity * (0.5 + 0.5 * Math.sin(p.twinkle * 2));
+
+                    const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
+                    glow.addColorStop(0, `rgba(${p.color}, ${twinkleAlpha})`);
+                    glow.addColorStop(0.4, `rgba(${p.color}, ${twinkleAlpha * 0.3})`);
+                    glow.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = glow;
+                    ctx.fillRect(p.x - p.size * 3, p.y - p.size * 3, p.size * 6, p.size * 6);
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * 1.2, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${p.color}, ${twinkleAlpha})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
+
+        // ==========================
+        // Confetti dorado al terminar
+        // ==========================
+        function celebrar() {
+            if (typeof confetti !== 'function') return;
+            const colores = ['#caa24a', '#e1c37a', '#f6e7c0', '#ffffff'];
+            confetti({ particleCount: 90, spread: 75, origin: { y: 0.7 }, colors: colores });
+            setTimeout(() => confetti({ particleCount: 60, angle: 60, spread: 60, origin: { x: 0, y: 0.8 }, colors: colores }), 250);
+            setTimeout(() => confetti({ particleCount: 60, angle: 120, spread: 60, origin: { x: 1, y: 0.8 }, colors: colores }), 400);
+        }
+
+        // ==========================
+        // Lógica de archivos
+        // ==========================
         document.getElementById('archivos').addEventListener('change', function(e) {
-            // Agregar los nuevos a la selección existente (sin duplicar por nombre+tamaño)
             const nuevos = Array.from(e.target.files);
             nuevos.forEach(f => {
                 const yaEsta = archivosSeleccionados.some(a => a.name === f.name && a.size === f.size);
                 if (!yaEsta) archivosSeleccionados.push(f);
             });
-            e.target.value = ""; // permite volver a elegir el mismo archivo
+            e.target.value = "";
             actualizarPreviews();
             actualizarStats();
         });
@@ -380,10 +645,9 @@
             contador.textContent = `${archivosSeleccionados.length} de ${MAX_ARCHIVOS} archivos`;
             tamañoTotal.textContent = `${tamañoMB} de ${MAX_MB_TOTAL} MB`;
 
-            // Color de advertencia
             if (archivosSeleccionados.length > MAX_ARCHIVOS || tamañoBytes > MAX_MB_TOTAL * BYTES_POR_MB) {
-                contador.style.color = '#dc3545';
-                tamañoTotal.style.color = '#dc3545';
+                contador.style.color = '#f1a7ae';
+                tamañoTotal.style.color = '#f1a7ae';
             } else {
                 contador.style.color = '';
                 tamañoTotal.style.color = '';
@@ -398,7 +662,6 @@
                 const previewItem = document.createElement('div');
                 previewItem.className = 'preview-item';
 
-                // Botón para quitar el archivo
                 const btnQuitar = document.createElement('button');
                 btnQuitar.className = 'btn-quitar';
                 btnQuitar.textContent = '✕';
@@ -406,7 +669,6 @@
                 btnQuitar.onclick = () => quitarArchivo(index);
                 previewItem.appendChild(btnQuitar);
 
-                // Tamaño del archivo
                 const tamañoMB = (file.size / BYTES_POR_MB).toFixed(2);
                 const sizeDiv = document.createElement('div');
                 sizeDiv.className = 'file-size';
@@ -439,7 +701,6 @@
         }
 
         // Sube un archivo y VERIFICA la respuesta del servidor.
-        // Lanza un error si el servidor no confirma la subida.
         async function subirUnArchivo(file, nombre) {
             const base64 = await convertirABase64(file);
             const base64Data = base64.split(',')[1];
@@ -452,7 +713,6 @@
                 nombreOriginal: file.name
             };
 
-            // Timeout manual para no quedarnos esperando forever
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -460,7 +720,6 @@
             try {
                 respuesta = await fetch(SCRIPT_URL, {
                     method: "POST",
-                    // text/plain evita el preflight CORS; Apps Script sí responde con CORS en /exec
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify(datos),
                     signal: controller.signal
@@ -480,7 +739,6 @@
                 throw new Error("El servidor no devolvió una confirmación válida");
             }
 
-            // Aceptar tanto { ok: true } como { status: "success" }
             const confirmado = resultado.ok === true || resultado.status === "success";
             if (!confirmado) {
                 throw new Error(resultado.mensaje || resultado.error || "El servidor rechazó el archivo");
@@ -496,7 +754,6 @@
             const progressFill = document.getElementById("progressFill");
             const progressText = document.getElementById("progressText");
 
-            // Validaciones
             if (archivosSeleccionados.length === 0) {
                 mostrarMensaje("❌ Selecciona al menos un archivo", "error");
                 return;
@@ -507,13 +764,11 @@
                 return;
             }
 
-            // Validar número de archivos
             if (archivosSeleccionados.length > MAX_ARCHIVOS) {
                 mostrarMensaje(`❌ Máximo ${MAX_ARCHIVOS} archivos por vez`, "error");
                 return;
             }
 
-            // Validar tamaño por archivo
             const archivosGrandes = archivosSeleccionados.filter(f => f.size > MAX_MB_POR_ARCHIVO * BYTES_POR_MB);
             if (archivosGrandes.length > 0) {
                 mostrarMensaje(`❌ Archivos muy grandes (máx ${MAX_MB_POR_ARCHIVO}MB c/u):\n${
@@ -522,14 +777,12 @@
                 return;
             }
 
-            // Validar tamaño total
             const tamañoTotal = archivosSeleccionados.reduce((sum, f) => sum + f.size, 0);
             if (tamañoTotal > MAX_MB_TOTAL * BYTES_POR_MB) {
                 mostrarMensaje(`❌ Tamaño total excede ${MAX_MB_TOTAL}MB`, "error");
                 return;
             }
 
-            // Preparar subida
             btnSubir.disabled = true;
             progressBar.style.display = "block";
             progressFill.style.width = "0%";
@@ -538,7 +791,6 @@
             let exitos = 0;
             let errores = [];
 
-            // Subir archivos en lotes de 3 para no saturar
             const LOTE = 3;
             for (let i = 0; i < archivosSeleccionados.length; i += LOTE) {
                 const lote = archivosSeleccionados.slice(i, i + LOTE);
@@ -562,17 +814,14 @@
                         errores.push(`❌ ${file.name} (${detalle})`);
                     }
 
-                    // Actualizar progreso
                     const progreso = (numActual / archivosSeleccionados.length) * 100;
                     progressFill.style.width = progreso + "%";
                     progressText.textContent = Math.round(progreso) + "%";
                 }
 
-                // Pequeña pausa entre lotes
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
 
-            // Mostrar resultados
             let mensajeFinal = "";
             if (exitos > 0) {
                 mensajeFinal += `✅ ¡Gracias! ${exitos} archivo(s) subido(s) correctamente\nCarlos y Jimena podrán verlos en su álbum 💕`;
@@ -584,15 +833,14 @@
 
             mostrarMensaje(mensajeFinal, errores.length === 0 ? "exito" : "error");
 
-            // Limpiar si todo salió bien
             if (errores.length === 0) {
+                celebrar();
                 document.getElementById("nombre").value = "";
                 archivosSeleccionados = [];
                 actualizarPreviews();
                 actualizarStats();
             }
 
-            // Resetear progreso
             btnSubir.disabled = false;
             setTimeout(() => {
                 progressBar.style.display = "none";
