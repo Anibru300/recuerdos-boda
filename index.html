@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comparte tus recuerdos - Boda</title>
+    <title>Carlos & Jimena - Comparte tus recuerdos</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Georgia', 'Times New Roman', serif;
             background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
             min-height: 100vh;
             margin: 0;
@@ -26,10 +26,29 @@
             text-align: center;
         }
 
-        h2 {
+        h1 {
             color: #ff6b6b;
-            margin-bottom: 30px;
-            font-size: 28px;
+            margin: 0 0 5px 0;
+            font-size: 36px;
+            letter-spacing: 1px;
+        }
+
+        .anillo {
+            font-size: 30px;
+        }
+
+        .subtitulo {
+            color: #4ecdc4;
+            font-size: 18px;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .mensaje-bienvenida {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
         .limites-info {
@@ -41,6 +60,7 @@
             font-size: 14px;
             color: #333;
             border-left: 4px solid #4ecdc4;
+            font-family: 'Arial', sans-serif;
         }
 
         .limites-info ul {
@@ -56,6 +76,7 @@
             border-radius: 10px;
             font-size: 16px;
             box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
 
         .file-input {
@@ -83,6 +104,7 @@
             transition: background 0.3s;
             width: 100%;
             box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
 
         .file-label:hover {
@@ -168,6 +190,7 @@
             background: #f5f5f5;
             border-radius: 10px;
             font-weight: bold;
+            font-family: 'Arial', sans-serif;
         }
 
         .progress-bar {
@@ -211,6 +234,7 @@
             transition: transform 0.3s, background 0.3s;
             margin-top: 20px;
             font-weight: bold;
+            font-family: 'Arial', sans-serif;
         }
 
         button:hover:not(:disabled) {
@@ -233,6 +257,7 @@
             overflow-y: auto;
             text-align: left;
             white-space: pre-line;
+            font-family: 'Arial', sans-serif;
         }
 
         .exito {
@@ -253,21 +278,23 @@
             display: block !important;
         }
 
-        .archivo-exito {
-            color: #28a745;
-        }
-
-        .archivo-error {
-            color: #dc3545;
+        .firma {
+            margin-top: 25px;
+            color: #999;
+            font-size: 13px;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>
-            <span>💍</span>
-            Comparte tus recuerdos
-        </h2>
+        <div class="anillo">💍</div>
+        <h1>Carlos & Jimena</h1>
+        <div class="subtitulo">Nuestra Boda</div>
+        <p class="mensaje-bienvenida">
+            ¡Gracias por celebrar con nosotros!<br>
+            Ayúdanos a guardar cada momento: comparte tus fotos y videos de este día tan especial.
+        </p>
 
         <div class="limites-info">
             <strong>📋 Límites para mejor funcionamiento:</strong>
@@ -301,6 +328,8 @@
         <button onclick="subirArchivos()" id="btnSubir">Subir archivos 📤</button>
 
         <div id="mensaje"></div>
+
+        <div class="firma">Con amor, Carlos & Jimena 💕</div>
     </div>
 
     <script>
@@ -309,10 +338,9 @@
         /*
          * Verificación de subida: el Apps Script responde JSON.
          * Se acepta cualquiera de estos formatos de éxito:
-         *   { "ok": true, ... }        <- formato actual de tu script
+         *   { "ok": true, ... }        <- formato actual del script en producción
          *   { "status": "success" }    <- formato del apps-script.gs de referencia
-         * Cualquier otra respuesta se marca como error con el detalle que mande el servidor.
-         * Probado el 2026-08-16: el script actual responde {"ok":true,"mensaje":"..."} ✅
+         * Probado el 2026-08-16: el script responde {"ok":true,"mensaje":"..."} ✅
          */
 
         // Límites
@@ -547,7 +575,7 @@
             // Mostrar resultados
             let mensajeFinal = "";
             if (exitos > 0) {
-                mensajeFinal += `✅ ${exitos} archivo(s) subido(s) correctamente`;
+                mensajeFinal += `✅ ¡Gracias! ${exitos} archivo(s) subido(s) correctamente\nCarlos y Jimena podrán verlos en su álbum 💕`;
             }
             if (errores.length > 0) {
                 mensajeFinal += `${exitos > 0 ? '\n\n' : ''}❌ ${errores.length} con error:\n${errores.join('\n')}`;
@@ -587,7 +615,7 @@
         }
 
         window.onload = function() {
-            mostrarMensaje("✨ ¡Comparte tus fotos y videos! (Máx 10 archivos por vez)", "info");
+            mostrarMensaje("✨ ¡Comparte tus fotos y videos de la boda! (Máx 10 archivos por vez)", "info");
         };
     </script>
 </body>
