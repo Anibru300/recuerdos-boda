@@ -307,12 +307,12 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUn3B76e83CXme6Bt5SusFbXNiJsfJ0ZT7nB6-0JG8mpqJGq8cOAHL5PGQtQO1rJzX9A/exec";
 
         /*
-         * IMPORTANTE: esta página ahora verifica la respuesta del servidor.
-         * Tu Google Apps Script debe responder con JSON, por ejemplo:
-         *   return ContentService
-         *     .createTextOutput(JSON.stringify({ status: "success", archivo: nombre }))
-         *     .setMimeType(ContentService.MimeType.JSON);
-         * En apps-script.gs de este repo tienes una versión de referencia completa.
+         * Verificación de subida: el Apps Script responde JSON.
+         * Se acepta cualquiera de estos formatos de éxito:
+         *   { "ok": true, ... }        <- formato actual de tu script
+         *   { "status": "success" }    <- formato del apps-script.gs de referencia
+         * Cualquier otra respuesta se marca como error con el detalle que mande el servidor.
+         * Probado el 2026-08-16: el script actual responde {"ok":true,"mensaje":"..."} ✅
          */
 
         // Límites
@@ -445,7 +445,6 @@
                 throw new Error(`HTTP ${respuesta.status}`);
             }
 
-            // El Apps Script debe confirmar con JSON { status: "success" }
             let resultado;
             try {
                 resultado = await respuesta.json();
@@ -453,8 +452,10 @@
                 throw new Error("El servidor no devolvió una confirmación válida");
             }
 
-            if (resultado.status !== "success") {
-                throw new Error(resultado.mensaje || "El servidor rechazó el archivo");
+            // Aceptar tanto { ok: true } como { status: "success" }
+            const confirmado = resultado.ok === true || resultado.status === "success";
+            if (!confirmado) {
+                throw new Error(resultado.mensaje || resultado.error || "El servidor rechazó el archivo");
             }
 
             return resultado;
