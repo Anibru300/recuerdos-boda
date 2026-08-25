@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Carlos y Jimena — Comparte tus recuerdos</title>
     <meta name="description" content="Comparte tus fotos y videos de la boda de Carlos y Jimena — 29 de agosto de 2026">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💛</text></svg>">
@@ -203,7 +203,8 @@
         }
 
         /* ---------- Inputs ---------- */
-        input[type="text"] {
+        input[type="text"],
+        textarea {
             width: 100%;
             padding: 15px 18px;
             margin: 8px 0;
@@ -215,15 +216,22 @@
             outline: none;
             transition: border-color 0.3s, box-shadow 0.3s;
             font-family: 'Inter', sans-serif;
+            resize: vertical;
         }
 
-        input[type="text"]::placeholder {
+        input[type="text"]::placeholder,
+        textarea::placeholder {
             color: rgba(255, 255, 255, 0.35);
         }
 
-        input[type="text"]:focus {
+        input[type="text"]:focus,
+        textarea:focus {
             border-color: var(--gold);
             box-shadow: 0 0 0 3px rgba(202, 162, 74, 0.15);
+        }
+
+        textarea {
+            min-height: 80px;
         }
 
         .file-input {
@@ -253,10 +261,16 @@
             width: 100%;
         }
 
-        .file-label:hover {
+        .file-label:hover,
+        .file-label.dragover {
             background: rgba(202, 162, 74, 0.1);
             border-color: var(--gold);
             transform: translateY(-1px);
+        }
+
+        .file-label.dragover {
+            border-style: solid;
+            background: rgba(202, 162, 74, 0.15);
         }
 
         /* ---------- Previews ---------- */
@@ -343,6 +357,25 @@
             z-index: 2;
         }
 
+        .preview-item .estado-icono {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .preview-item .estado-pendiente { background: rgba(255, 193, 7, 0.9); color: #000; }
+        .preview-item .estado-subiendo { background: rgba(202, 162, 74, 0.95); color: #000; }
+        .preview-item .estado-ok { background: rgba(40, 167, 69, 0.9); color: #fff; }
+        .preview-item .estado-error { background: rgba(220, 53, 69, 0.9); color: #fff; }
+
         /* ---------- Stats ---------- */
         .stats {
             display: flex;
@@ -387,6 +420,7 @@
             font-size: 12px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
             z-index: 1;
+            white-space: nowrap;
         }
 
         /* ---------- Botón principal ---------- */
@@ -492,17 +526,22 @@
             <strong>📋 Límites para mejor funcionamiento:</strong>
             <ul>
                 <li>Máximo <strong>10 archivos</strong> por vez</li>
-                <li>Máximo <strong>10MB por archivo</strong></li>
-                <li>Máximo <strong>50MB total</strong></li>
-                <li>Formatos: Imágenes (JPG, PNG, GIF, BMP, WEBP) y Videos (MP4, MOV, AVI, WEBM, MKV)</li>
+                <li>Las fotos se comprimen automáticamente para subir más rápido</li>
+                <li>Videos: máximo <strong>10 MB por archivo</strong></li>
+                <li>Formatos: JPG, PNG, GIF, WEBP, MP4, MOV, AVI, WEBM, MKV</li>
             </ul>
         </div>
 
         <input type="text" id="nombre" placeholder="Tu nombre completo" required>
 
-        <div class="file-input">
+        <textarea id="mensaje" placeholder="Mensaje o dedicatoria para los novios (opcional)" rows="3"></textarea>
+
+        <div class="file-input" id="dropZone">
             <input type="file" id="archivos" accept="image/*,video/*" multiple required>
-            <label for="archivos" class="file-label">📁 Seleccionar fotos y videos</label>
+            <label for="archivos" class="file-label" id="dropLabel">
+                📁 Toca para seleccionar fotos y videos<br>
+                <small style="opacity: .7;">o arrástralas aquí</small>
+            </label>
         </div>
 
         <div class="stats">
@@ -527,25 +566,20 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUn3B76e83CXme6Bt5SusFbXNiJsfJ0ZT7nB6-0JG8mpqJGq8cOAHL5PGQtQO1rJzX9A/exec";
 
-        /*
-         * Verificación de subida: el Apps Script responde JSON.
-         * Formatos de éxito aceptados:
-         *   { "ok": true, ... }        <- formato actual del script en producción
-         *   { "status": "success" }    <- formato del apps-script.gs de referencia
-         * Probado el 2026-08-16: el script responde {"ok":true,"mensaje":"..."} ✅
-         */
-
         // Límites
         const MAX_ARCHIVOS = 10;
-        const MAX_MB_POR_ARCHIVO = 10;
-        const MAX_MB_TOTAL = 50;
+        const MAX_MB_VIDEO = 10;              // videos no se comprimen
+        const MAX_MB_IMAGEN_ORIGINAL = 25;    // rechazamos imágenes enormes
+        const MAX_MB_SUBIDA = 8;              // límite seguro por petición a Apps Script
+        const MAX_MB_TOTAL = 50;              // tope total de selección
         const BYTES_POR_MB = 1024 * 1024;
-        const TIMEOUT_MS = 120000; // 2 minutos por archivo
+        const TIMEOUT_MS = 90000;             // 1.5 minutos por archivo
+        const MAX_REINTENTOS = 2;             // 3 intentos en total
 
-        let archivosSeleccionados = [];
+        let archivosSeleccionados = [];       // { file, id, tipo, comprimido, blob, estado, error }
 
         // ==========================
-        // Partículas doradas (igual que en la invitación)
+        // Partículas doradas
         // ==========================
         (function initParticles() {
             const canvas = document.getElementById('particles-bg');
@@ -605,7 +639,7 @@
         })();
 
         // ==========================
-        // Confetti dorado al terminar
+        // Confetti dorado
         // ==========================
         function celebrar() {
             if (typeof confetti !== 'function') return;
@@ -616,21 +650,93 @@
         }
 
         // ==========================
+        // Drag & drop
+        // ==========================
+        const dropZone = document.getElementById('dropZone');
+        const dropLabel = document.getElementById('dropLabel');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropLabel.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropLabel.classList.remove('dragover'), false);
+        });
+
+        dropZone.addEventListener('drop', e => {
+            const archivos = Array.from(e.dataTransfer.files);
+            agregarArchivos(archivos);
+        });
+
+        // ==========================
         // Lógica de archivos
         // ==========================
         document.getElementById('archivos').addEventListener('change', function(e) {
-            const nuevos = Array.from(e.target.files);
-            nuevos.forEach(f => {
-                const yaEsta = archivosSeleccionados.some(a => a.name === f.name && a.size === f.size);
-                if (!yaEsta) archivosSeleccionados.push(f);
-            });
+            agregarArchivos(Array.from(e.target.files));
             e.target.value = "";
-            actualizarPreviews();
-            actualizarStats();
         });
 
-        function quitarArchivo(index) {
-            archivosSeleccionados.splice(index, 1);
+        function generarId() {
+            return Math.random().toString(36).substring(2, 9);
+        }
+
+        function agregarArchivos(nuevos) {
+            let agregados = 0;
+            let rechazados = [];
+
+            nuevos.forEach(file => {
+                const esImagen = file.type.startsWith('image/');
+                const esVideo = file.type.startsWith('video/');
+
+                if (!esImagen && !esVideo) {
+                    rechazados.push(`${file.name} (formato no soportado)`);
+                    return;
+                }
+
+                if (archivosSeleccionados.length + agregados >= MAX_ARCHIVOS) {
+                    rechazados.push(`${file.name} (límite de ${MAX_ARCHIVOS} archivos)`);
+                    return;
+                }
+
+                if (esImagen && file.size > MAX_MB_IMAGEN_ORIGINAL * BYTES_POR_MB) {
+                    rechazados.push(`${file.name} (imagen demasiado grande, máx ${MAX_MB_IMAGEN_ORIGINAL}MB)`);
+                    return;
+                }
+
+                if (esVideo && file.size > MAX_MB_VIDEO * BYTES_POR_MB) {
+                    rechazados.push(`${file.name} (video muy grande, máx ${MAX_MB_VIDEO}MB)`);
+                    return;
+                }
+
+                const yaEsta = archivosSeleccionados.some(a => a.file.name === file.name && a.file.size === file.size);
+                if (!yaEsta) {
+                    archivosSeleccionados.push({
+                        id: generarId(),
+                        file: file,
+                        tipo: esImagen ? 'imagen' : 'video',
+                        estado: 'pendiente',
+                        error: null,
+                        comprimido: false,
+                        blob: null
+                    });
+                    agregados++;
+                }
+            });
+
+            actualizarPreviews();
+            actualizarStats();
+
+            if (rechazados.length > 0) {
+                mostrarMensaje('⚠️ Algunos archivos no se agregaron:\n' + rechazados.join('\n'), 'error');
+            }
+        }
+
+        function quitarArchivo(id) {
+            archivosSeleccionados = archivosSeleccionados.filter(a => a.id !== id);
             actualizarPreviews();
             actualizarStats();
         }
@@ -639,7 +745,7 @@
             const contador = document.getElementById('contador');
             const tamañoTotal = document.getElementById('tamañoTotal');
 
-            const tamañoBytes = archivosSeleccionados.reduce((sum, f) => sum + f.size, 0);
+            const tamañoBytes = archivosSeleccionados.reduce((sum, a) => sum + a.file.size, 0);
             const tamañoMB = (tamañoBytes / BYTES_POR_MB).toFixed(2);
 
             contador.textContent = `${archivosSeleccionados.length} de ${MAX_ARCHIVOS} archivos`;
@@ -658,18 +764,27 @@
             const previewContainer = document.getElementById('previewContainer');
             previewContainer.innerHTML = '';
 
-            archivosSeleccionados.forEach((file, index) => {
+            archivosSeleccionados.forEach(item => {
                 const previewItem = document.createElement('div');
                 previewItem.className = 'preview-item';
+                previewItem.id = 'preview-' + item.id;
 
                 const btnQuitar = document.createElement('button');
                 btnQuitar.className = 'btn-quitar';
                 btnQuitar.textContent = '✕';
                 btnQuitar.title = 'Quitar este archivo';
-                btnQuitar.onclick = () => quitarArchivo(index);
+                btnQuitar.onclick = () => quitarArchivo(item.id);
                 previewItem.appendChild(btnQuitar);
 
-                const tamañoMB = (file.size / BYTES_POR_MB).toFixed(2);
+                const estadoIcono = document.createElement('div');
+                estadoIcono.className = 'estado-icono estado-' + item.estado;
+                estadoIcono.id = 'estado-' + item.id;
+                estadoIcono.textContent = item.estado === 'ok' ? '✓' :
+                                          item.estado === 'error' ? '!' :
+                                          item.estado === 'subiendo' ? '↻' : '•';
+                previewItem.appendChild(estadoIcono);
+
+                const tamañoMB = (item.file.size / BYTES_POR_MB).toFixed(2);
                 const sizeDiv = document.createElement('div');
                 sizeDiv.className = 'file-size';
                 sizeDiv.textContent = `${tamañoMB}MB`;
@@ -677,11 +792,11 @@
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    if (file.type.startsWith('image/')) {
+                    if (item.tipo === 'imagen') {
                         const img = document.createElement('img');
                         img.src = e.target.result;
                         previewItem.appendChild(img);
-                    } else if (file.type.startsWith('video/')) {
+                    } else {
                         const video = document.createElement('video');
                         video.src = e.target.result;
                         video.muted = true;
@@ -691,26 +806,115 @@
 
                     const fileInfo = document.createElement('div');
                     fileInfo.className = 'file-info';
-                    fileInfo.textContent = file.name.substring(0, 8) + '...';
+                    fileInfo.textContent = item.file.name.substring(0, 8) + '...';
                     previewItem.appendChild(fileInfo);
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(item.file);
 
                 previewContainer.appendChild(previewItem);
             });
         }
 
-        // Sube un archivo y VERIFICA la respuesta del servidor.
-        async function subirUnArchivo(file, nombre) {
-            const base64 = await convertirABase64(file);
+        function setEstado(id, estado) {
+            const item = archivosSeleccionados.find(a => a.id === id);
+            if (item) item.estado = estado;
+
+            const icono = document.getElementById('estado-' + id);
+            if (icono) {
+                icono.className = 'estado-icono estado-' + estado;
+                icono.textContent = estado === 'ok' ? '✓' :
+                                    estado === 'error' ? '!' :
+                                    estado === 'subiendo' ? '↻' : '•';
+            }
+        }
+
+        // ==========================
+        // Compresión de imágenes
+        // ==========================
+        function comprimirImagen(file, maxAncho = 1920, calidad = 0.82) {
+            return new Promise((resolve, reject) => {
+                // Si no es imagen o ya es pequeña, no comprimir
+                if (!file.type.startsWith('image/')) {
+                    resolve(file);
+                    return;
+                }
+
+                const img = new Image();
+                img.onload = function() {
+                    let ancho = img.width;
+                    let alto = img.height;
+
+                    if (ancho > maxAncho) {
+                        alto = Math.round(alto * (maxAncho / ancho));
+                        ancho = maxAncho;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = ancho;
+                    canvas.height = alto;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, ancho, alto);
+
+                    canvas.toBlob(blob => {
+                        if (!blob) {
+                            reject(new Error('No se pudo comprimir la imagen'));
+                            return;
+                        }
+
+                        // Creamos un nuevo File para mantener el nombre
+                        const archivoComprimido = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+
+                        resolve(archivoComprimido);
+                    }, 'image/jpeg', calidad);
+                };
+
+                img.onerror = () => reject(new Error('No se pudo leer la imagen para comprimir'));
+
+                const reader = new FileReader();
+                reader.onload = e => { img.src = e.target.result; };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ==========================
+        // Subida con reintentos
+        // ==========================
+        async function subirUnArchivo(item, nombre, mensajeInvitado, intento = 1) {
+            setEstado(item.id, 'subiendo');
+
+            // Comprimir imágenes antes de convertir a base64
+            let archivoParaSubir = item.file;
+            if (item.tipo === 'imagen') {
+                try {
+                    archivoParaSubir = await comprimirImagen(item.file);
+                    item.comprimido = true;
+                    item.blob = archivoParaSubir;
+                } catch (err) {
+                    console.warn('No se pudo comprimir, se sube original:', err);
+                    archivoParaSubir = item.file;
+                }
+            }
+
+            // Validar tamaño final por subida
+            if (archivoParaSubir.size > MAX_MB_SUBIDA * BYTES_POR_MB) {
+                throw new Error(`El archivo pesa ${(archivoParaSubir.size / BYTES_POR_MB).toFixed(2)}MB después de comprimir, máx ${MAX_MB_SUBIDA}MB por subida`);
+            }
+
+            const base64 = await convertirABase64(archivoParaSubir);
             const base64Data = base64.split(',')[1];
 
             const datos = {
                 nombre: nombre,
+                mensaje: mensajeInvitado || '',
                 imagen: base64Data,
-                extension: file.name.split('.').pop().toLowerCase(),
-                mimeType: file.type,
-                nombreOriginal: file.name
+                extension: archivoParaSubir.name.split('.').pop().toLowerCase(),
+                mimeType: archivoParaSubir.type || 'application/octet-stream',
+                nombreOriginal: archivoParaSubir.name,
+                tamanioBytes: archivoParaSubir.size
             };
 
             const controller = new AbortController();
@@ -744,11 +948,32 @@
                 throw new Error(resultado.mensaje || resultado.error || "El servidor rechazó el archivo");
             }
 
+            setEstado(item.id, 'ok');
             return resultado;
+        }
+
+        async function subirConReintentos(item, nombre, mensajeInvitado) {
+            let ultimoError = null;
+            for (let intento = 1; intento <= MAX_REINTENTOS + 1; intento++) {
+                try {
+                    return await subirUnArchivo(item, nombre, mensajeInvitado, intento);
+                } catch (error) {
+                    ultimoError = error;
+                    console.warn(`Intento ${intento} falló para ${item.file.name}:`, error);
+                    if (intento <= MAX_REINTENTOS) {
+                        setEstado(item.id, 'subiendo');
+                        mostrarMensaje(`⏳ Reintentando ${item.file.name} (intento ${intento + 1}/${MAX_REINTENTOS + 1})`, "info");
+                        await esperar(intento * 1500);
+                    }
+                }
+            }
+            setEstado(item.id, 'error');
+            throw ultimoError;
         }
 
         async function subirArchivos() {
             const nombre = document.getElementById("nombre").value.trim();
+            const mensajeInvitado = document.getElementById("mensaje").value.trim();
             const btnSubir = document.getElementById("btnSubir");
             const progressBar = document.getElementById("progressBar");
             const progressFill = document.getElementById("progressFill");
@@ -769,15 +994,7 @@
                 return;
             }
 
-            const archivosGrandes = archivosSeleccionados.filter(f => f.size > MAX_MB_POR_ARCHIVO * BYTES_POR_MB);
-            if (archivosGrandes.length > 0) {
-                mostrarMensaje(`❌ Archivos muy grandes (máx ${MAX_MB_POR_ARCHIVO}MB c/u):\n${
-                    archivosGrandes.map(f => `📁 ${f.name} (${(f.size/BYTES_POR_MB).toFixed(2)}MB)`).join('\n')
-                }`, "error");
-                return;
-            }
-
-            const tamañoTotal = archivosSeleccionados.reduce((sum, f) => sum + f.size, 0);
+            const tamañoTotal = archivosSeleccionados.reduce((sum, a) => sum + a.file.size, 0);
             if (tamañoTotal > MAX_MB_TOTAL * BYTES_POR_MB) {
                 mostrarMensaje(`❌ Tamaño total excede ${MAX_MB_TOTAL}MB`, "error");
                 return;
@@ -791,44 +1008,42 @@
             let exitos = 0;
             let errores = [];
 
-            const LOTE = 3;
-            for (let i = 0; i < archivosSeleccionados.length; i += LOTE) {
-                const lote = archivosSeleccionados.slice(i, i + LOTE);
+            for (let i = 0; i < archivosSeleccionados.length; i++) {
+                const item = archivosSeleccionados[i];
+                const numActual = i + 1;
 
-                for (let j = 0; j < lote.length; j++) {
-                    const file = lote[j];
-                    const numActual = i + j + 1;
+                try {
+                    progressText.textContent = `Subiendo ${numActual}/${archivosSeleccionados.length}`;
+                    mostrarMensaje(`⏳ Subiendo ${numActual}/${archivosSeleccionados.length}: ${item.file.name}`, "info");
 
-                    try {
-                        progressText.textContent = `Subiendo ${numActual}/${archivosSeleccionados.length}`;
-                        mostrarMensaje(`⏳ Subiendo ${numActual}/${archivosSeleccionados.length}: ${file.name}`, "info");
+                    await subirConReintentos(item, nombre, mensajeInvitado);
+                    exitos++;
 
-                        await subirUnArchivo(file, nombre);
-                        exitos++;
-
-                    } catch (error) {
-                        console.error("Error subiendo", file.name, error);
-                        let detalle = "error de red o servidor";
-                        if (error.name === "AbortError") detalle = "tiempo de espera agotado";
-                        else if (error.message) detalle = error.message;
-                        errores.push(`❌ ${file.name} (${detalle})`);
-                    }
-
-                    const progreso = (numActual / archivosSeleccionados.length) * 100;
-                    progressFill.style.width = progreso + "%";
-                    progressText.textContent = Math.round(progreso) + "%";
+                } catch (error) {
+                    console.error("Error subiendo", item.file.name, error);
+                    let detalle = "error de red o servidor";
+                    if (error.name === "AbortError") detalle = "tiempo de espera agotado";
+                    else if (error.message) detalle = error.message;
+                    errores.push(`❌ ${item.file.name} (${detalle})`);
                 }
 
-                await new Promise(resolve => setTimeout(resolve, 500));
+                const progreso = (numActual / archivosSeleccionados.length) * 100;
+                progressFill.style.width = progreso + "%";
+                progressText.textContent = Math.round(progreso) + "%";
+
+                // Pequeña pausa entre archivos para no saturar Apps Script
+                if (i < archivosSeleccionados.length - 1) {
+                    await esperar(600);
+                }
             }
 
             let mensajeFinal = "";
             if (exitos > 0) {
-                mensajeFinal += `✅ ¡Gracias! ${exitos} archivo(s) subido(s) correctamente\nCarlos y Jimena podrán verlos en su álbum 💕`;
+                mensajeFinal += `✅ ¡Gracias! ${exitos} archivo(s) subido(s) correctamente.\nCarlos y Jimena podrán verlos en su álbum 💕`;
             }
             if (errores.length > 0) {
                 mensajeFinal += `${exitos > 0 ? '\n\n' : ''}❌ ${errores.length} con error:\n${errores.join('\n')}`;
-                mensajeFinal += `\n\nPuedes volver a intentarlo con los archivos que fallaron.`;
+                mensajeFinal += `\n\nPuedes volver a intentarlo con los archivos que fallaron sin borrar los que ya subieron.`;
             }
 
             mostrarMensaje(mensajeFinal, errores.length === 0 ? "exito" : "error");
@@ -836,6 +1051,7 @@
             if (errores.length === 0) {
                 celebrar();
                 document.getElementById("nombre").value = "";
+                document.getElementById("mensaje").value = "";
                 archivosSeleccionados = [];
                 actualizarPreviews();
                 actualizarStats();
@@ -844,14 +1060,14 @@
             btnSubir.disabled = false;
             setTimeout(() => {
                 progressBar.style.display = "none";
-            }, 3000);
+            }, 4000);
         }
 
         function convertirABase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
+                reader.onerror = () => reject(new Error("Error al leer el archivo"));
                 reader.readAsDataURL(file);
             });
         }
@@ -862,8 +1078,12 @@
             mensajeDiv.className = tipo;
         }
 
+        function esperar(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         window.onload = function() {
-            mostrarMensaje("✨ ¡Comparte tus fotos y videos de la boda! (Máx 10 archivos por vez)", "info");
+            mostrarMensaje("✨ ¡Comparte tus fotos y videos de la boda! Las fotos se comprimen automáticamente para subir más rápido.", "info");
         };
     </script>
 </body>

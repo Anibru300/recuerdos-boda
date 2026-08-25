@@ -11,11 +11,22 @@ Página web para que los invitados suban fotos y videos de la boda directamente 
 
 ## Cómo funciona
 
-1. El invitado escribe su nombre y selecciona fotos/videos.
-2. La página valida límites (máx. 10 archivos, 10MB por archivo, 50MB en total).
-3. Cada archivo se convierte a base64 y se envía al Apps Script.
-4. El Apps Script lo guarda en la carpeta de Drive y responde `{ "status": "success" }`.
-5. La página **verifica la respuesta** y le confirma al invitado si la subida funcionó o falló.
+1. El invitado escribe su nombre, un mensaje opcional y selecciona fotos/videos.
+2. La página valida límites y **comprime automáticamente las fotos** para subir más rápido y sin errores.
+3. Los archivos se envían **uno por uno** al Apps Script con **reintentos automáticos** si algo falla.
+4. El Apps Script guarda cada archivo en la carpeta de Drive y responde `{ ok: true }`.
+5. La página verifica la respuesta y confirma al invitado qué archivos subieron correctamente.
+
+## Novedades de esta versión
+
+- ✅ **Compresión automática de fotos** en el navegador antes de enviar.
+- ✅ **Subida uno por uno** para evitar saturar Apps Script.
+- ✅ **Reintentos automáticos** (hasta 3 intentos) si falla un archivo.
+- ✅ **Drag & drop**: arrastra fotos directamente a la zona de carga.
+- ✅ **Campo de mensaje/dedicatoria** opcional para los novios.
+- ✅ **Progreso detallado** con nombre del archivo actual.
+- ✅ **Validaciones en el servidor** para evitar archivos que superen el límite de Apps Script.
+- ✅ **Estado visual por archivo**: pendiente, subiendo, listo o con error.
 
 ## Despliegue
 
@@ -30,5 +41,24 @@ La URL `/exec` que te da Google va en la constante `SCRIPT_URL` de `index.html`.
 
 ## Límites
 
-- Los límites (10 archivos / 10MB / 50MB) se ajustan en las constantes `MAX_*` de `index.html`.
-- Google Apps Script tiene un límite de ~50MB por petición POST, así que no conviene subir mucho más de eso por archivo.
+| Concepto | Límite |
+|---|---|
+| Archivos por vez | 10 |
+| Tamaño por imagen original | 25 MB (se comprime automáticamente) |
+| Tamaño por video | 10 MB (no se comprimen) |
+| Tamaño total aproximado | 50 MB |
+| Tamaño máximo por subida al servidor | ~12 MB |
+
+> ⚠️ **Nota importante:** Google Apps Script tiene un límite de ~50 MB por petición POST y el envío en base64 aumenta el tamaño ~33%. Por eso el frontend ahora comprime imágenes y sube un archivo a la vez, con reintentos automáticos.
+
+## Solución de problemas
+
+**"Solo subieron 3 de 10 fotos"**
+- Esto solía pasar porque el límite de payload de Apps Script se rompía al enviar muchos archivos grandes juntos. Ahora se suben uno por uno y las fotos se comprimen antes de enviar.
+
+**"En unos celulares funciona y en otros no"**
+- Los celulares con poca memoria o conexión lenta a veces fallaban al convertir archivos grandes a base64. La compresión reduce drásticamente el uso de memoria y los reintentos automáticos ayudan con redes inestables.
+
+**"Error de red o servidor"**
+- Revisa que la URL de `SCRIPT_URL` esté actualizada y que el Apps Script tenga acceso "Cualquier persona".
+- Revisa los logs del Apps Script (ver `Ejecuciones` en el editor) para ver el mensaje de error exacto.
