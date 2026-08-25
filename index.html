@@ -712,6 +712,13 @@
                     return;
                 }
 
+                // HEIC/HEIF de iPhone no se leen bien en todos los Android
+                const extension = file.name.split('.').pop().toLowerCase();
+                if (['heic', 'heif'].includes(extension) || file.type === 'image/heic' || file.type === 'image/heif') {
+                    rechazados.push(`${file.name} (formato HEIC/HEIF no soportado, conviértelo a JPG)`);
+                    return;
+                }
+
                 const yaEsta = archivosSeleccionados.some(a => a.file.name === file.name && a.file.size === file.size);
                 if (!yaEsta) {
                     archivosSeleccionados.push({
@@ -1043,7 +1050,10 @@
             }
             if (errores.length > 0) {
                 mensajeFinal += `${exitos > 0 ? '\n\n' : ''}❌ ${errores.length} con error:\n${errores.join('\n')}`;
-                mensajeFinal += `\n\nPuedes volver a intentarlo con los archivos que fallaron sin borrar los que ya subieron.`;
+                mensajeFinal += `\n\nConsejos:`;
+                mensajeFinal += `\n• Si la foto está en iCloud/Google Fotos, asegúrate de que se haya descargado al celular.`;
+                mensajeFinal += `\n• Si es formato HEIC/HEIF de iPhone, conviértela a JPG antes de subir.`;
+                mensajeFinal += `\n• Puedes volver a intentarlo con los archivos que fallaron sin borrar los que ya subieron.`;
             }
 
             mostrarMensaje(mensajeFinal, errores.length === 0 ? "exito" : "error");
@@ -1063,13 +1073,61 @@
             }, 4000);
         }
 
+        // Intenta leer como DataURL; si falla, intenta como ArrayBuffer.
+        // Algunos celulares (especialmente iPhone con fotos en la nube) no permiten DataURL.
         function convertirABase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
+
                 reader.onload = () => resolve(reader.result);
-                reader.onerror = () => reject(new Error("Error al leer el archivo"));
+
+                reader.onerror = () => {
+                    console.warn('FileReader.readAsDataURL falló para', file.name, 'intentando readAsArrayBuffer');
+                    leerArrayBuffer(file)
+                        .then(buffer => {
+                            try {
+                                const base64 = arrayBufferToBase64(buffer);
+                                const mime = file.type || 'application/octet-stream';
+                                resolve(`data:${mime};base64,${base64}`);
+                            } catch (err) {
+                                reject(new Error('No se pudo codificar el archivo'));
+                            }
+                        })
+                        .catch(err => {
+                            let mensaje = 'Error al leer el archivo';
+                            if (file.name.match(/\.(heic|heif)$/i)) {
+                                mensaje = 'Formato HEIC/HEIF no soportado, conviértelo a JPG';
+                            } else if (!file.size || file.size === 0) {
+                                mensaje = 'El archivo está vacío o no se descargó de la nube';
+                            } else if (err && err.message) {
+                                mensaje = err.message;
+                            }
+                            reject(new Error(mensaje));
+                        });
+                };
+
                 reader.readAsDataURL(file);
             });
+        }
+
+        function leerArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('No se pudo leer el archivo como buffer'));
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            const chunkSize = 1024 * 1024; // 1 MB por chunk para no bloquear
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                const chunk = bytes.subarray(i, i + chunkSize);
+                binary += String.fromCharCode.apply(null, chunk);
+            }
+            return window.btoa(binary);
         }
 
         function mostrarMensaje(texto, tipo) {
