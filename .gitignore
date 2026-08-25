@@ -18,3 +18,8 @@ node_modules/
 # Builds
 /dist
 /build
+
+# Archivos generados para pruebas locales
+test/test.html
+test/uploads/*
+!test/uploads/.gitkeep
