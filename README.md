@@ -11,7 +11,7 @@ Página web para que los invitados suban fotos y videos de la boda directamente 
 
 ## Cómo funciona
 
-1. El invitado escribe su nombre, un mensaje opcional y selecciona fotos/videos.
+1. El invitado escribe su nombre (opcional) y selecciona fotos/videos.
 2. La página valida límites y **comprime automáticamente las fotos** para subir más rápido y sin errores.
 3. Los archivos se envían **uno por uno** al Apps Script con **reintentos automáticos** si algo falla.
 4. El Apps Script guarda cada archivo en la carpeta de Drive y responde `{ ok: true }`.
@@ -23,7 +23,6 @@ Página web para que los invitados suban fotos y videos de la boda directamente 
 - ✅ **Subida uno por uno** para evitar saturar Apps Script.
 - ✅ **Reintentos automáticos** (hasta 3 intentos) si falla un archivo.
 - ✅ **Drag & drop**: arrastra fotos directamente a la zona de carga.
-- ✅ **Campo de mensaje/dedicatoria** opcional para los novios.
 - ✅ **Progreso detallado** con nombre del archivo actual.
 - ✅ **Validaciones en el servidor** para evitar archivos que superen el límite de Apps Script.
 - ✅ **Estado visual por archivo**: pendiente, subiendo, listo o con error.

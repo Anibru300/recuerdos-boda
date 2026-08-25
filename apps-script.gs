@@ -90,7 +90,7 @@ function doPost(e) {
 // Nombre final: 2026-08-16_14-30-05_NombreInvitado_foto.jpg
 function generarNombreArchivo(datos) {
   const fecha = Utilities.formatDate(new Date(), "America/Mexico_City", "yyyy-MM-dd_HH-mm-ss");
-  const invitado = String(datos.nombre).trim().replace(/[^\wáéíóúñü ]/gi, "").substring(0, 50);
+  const invitado = String(datos.nombre).trim().replace(/[^\wáéíóúñü ]/gi, "").substring(0, 50) || "Invitado";
   const original = datos.nombreOriginal || ("archivo." + (datos.extension || "bin"));
   return fecha + "_" + invitado + "_" + original;
 }
